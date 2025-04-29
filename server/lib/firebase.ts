@@ -1,5 +1,5 @@
 import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp, FieldValue, CollectionReference, DocumentData, Query } from 'firebase-admin/firestore';
 import { type PartyId, type InsertUser, type User, type InsertVote, type Vote, type PartyResult, type ResultsResponse } from '@shared/schema';
 
 // Initialize Firebase Admin with environment variables

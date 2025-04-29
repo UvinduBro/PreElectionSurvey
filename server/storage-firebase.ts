@@ -1,4 +1,5 @@
 import { db, votesCollection, usersCollection, partyData } from './lib/firebase';
+import { DocumentData } from 'firebase-admin/firestore';
 import { type User, type InsertUser, type Vote, type InsertVote, type PartyResult, type ResultsResponse, type PartyId } from "@shared/schema";
 import { IStorage } from './storage';
 
@@ -108,7 +109,7 @@ export class FirebaseStorage implements IStorage {
   async getResults(district?: string, localGovernment?: string): Promise<ResultsResponse> {
     try {
       // Create query based on filters
-      let query = votesCollection;
+      let query: any = votesCollection;
       
       if (district && district !== 'all') {
         query = query.where('district', '==', district);
@@ -120,7 +121,7 @@ export class FirebaseStorage implements IStorage {
       
       // Execute query
       const snapshot = await query.get();
-      const votes = snapshot.docs.map(doc => ({ id: parseInt(doc.id), ...doc.data() })) as Vote[];
+      const votes = snapshot.docs.map((doc: DocumentData) => ({ id: parseInt(doc.id), ...doc.data() })) as Vote[];
       
       // Count votes for each party
       const totalVotes = votes.length;
@@ -163,7 +164,7 @@ export class FirebaseStorage implements IStorage {
       
       // Get all votes for local government information
       const allVotesSnapshot = await votesCollection.get();
-      const allVotes = allVotesSnapshot.docs.map(doc => ({ id: parseInt(doc.id), ...doc.data() })) as Vote[];
+      const allVotes = allVotesSnapshot.docs.map((doc: DocumentData) => ({ id: parseInt(doc.id), ...doc.data() })) as Vote[];
       
       // Extract unique local governments from actual votes
       // This will change based on the selected district
@@ -179,7 +180,7 @@ export class FirebaseStorage implements IStorage {
       }
 
       // Prepare minimal vote info for filtering
-      const voteInfo = allVotes.map(vote => ({
+      const voteInfo = allVotes.map((vote: Vote) => ({
         district: vote.district,
         localGovernment: vote.localGovernment
       }));

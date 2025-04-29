@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { PartyCard } from "@/components/PartyCard";
 import { usePartyData } from "@/hooks/usePartyData";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle } from "lucide-react";
 
 export function ResultsSection() {
+  const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>(undefined);
+  const [selectedLocalGov, setSelectedLocalGov] = useState<string | undefined>(undefined);
+  
   const { 
     partyResults, 
     totalVotes, 
@@ -18,7 +22,30 @@ export function ResultsSection() {
     setLocalGovernment,
     isLoading, 
     isError 
-  } = usePartyData();
+  } = usePartyData({
+    initialDistrict: selectedDistrict,
+    initialLocalGovernment: selectedLocalGov
+  });
+  
+  // Handle district change
+  const handleDistrictChange = (value: string | undefined) => {
+    setSelectedDistrict(value);
+    setDistrict(value);
+  };
+  
+  // Handle local government change
+  const handleLocalGovChange = (value: string | undefined) => {
+    setSelectedLocalGov(value);
+    setLocalGovernment(value);
+  };
+  
+  // Handle clearing filters
+  const handleClearFilters = () => {
+    setSelectedDistrict(undefined);
+    setSelectedLocalGov(undefined);
+    setDistrict(undefined);
+    setLocalGovernment(undefined);
+  };
 
   if (isError) {
     return (
@@ -43,7 +70,7 @@ export function ResultsSection() {
             <div className="w-full md:w-[200px]">
               <Select
                 value={district}
-                onValueChange={(value) => setDistrict(value || undefined)}
+                onValueChange={(value) => handleDistrictChange(value || undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Districts" />
@@ -60,7 +87,7 @@ export function ResultsSection() {
             <div className="w-full md:w-[250px]">
               <Select
                 value={localGovernment}
-                onValueChange={(value) => setLocalGovernment(value || undefined)}
+                onValueChange={(value) => handleLocalGovChange(value || undefined)}
                 disabled={!district || availableLocalGovernments.length === 0}
               >
                 <SelectTrigger>
@@ -78,10 +105,7 @@ export function ResultsSection() {
             {((district && district !== 'all') || (localGovernment && localGovernment !== 'all')) && (
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  setDistrict(undefined);
-                  setLocalGovernment(undefined);
-                }}
+                onClick={handleClearFilters}
                 className="h-10"
               >
                 Clear Filters
