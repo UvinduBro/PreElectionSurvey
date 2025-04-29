@@ -69,6 +69,12 @@ export const resultsResponseSchema = z.object({
   parties: z.array(partyResultSchema),
   totalVotes: z.number(),
   lastUpdated: z.string(),
+  districts: z.array(z.string()).optional(),
+  localGovernments: z.array(z.string()).optional(),
+  filters: z.object({
+    district: z.string().nullable(),
+    localGovernment: z.string().nullable()
+  }).optional()
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

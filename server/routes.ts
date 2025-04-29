@@ -8,10 +8,13 @@ import { fromZodError } from "zod-validation-error";
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
 
-  // API endpoint to get election results
-  app.get("/api/results", async (_req: Request, res: Response) => {
+  // API endpoint to get election results with optional filters
+  app.get("/api/results", async (req: Request, res: Response) => {
     try {
-      const results = await storage.getResults();
+      const district = req.query.district as string | undefined;
+      const localGovernment = req.query.localGovernment as string | undefined;
+      
+      const results = await storage.getResults(district, localGovernment);
       res.json(results);
     } catch (error) {
       console.error("Error fetching results:", error);

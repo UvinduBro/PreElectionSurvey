@@ -1,4 +1,4 @@
-import { votes, type Vote, type InsertVote, type PartyResult, type ResultsResponse, type PartyId } from "@shared/schema";
+import { votes, users, type User, type InsertUser, type Vote, type InsertVote, type PartyResult, type ResultsResponse, type PartyId } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -10,7 +10,7 @@ export interface IStorage {
   // Vote related methods
   createVote(vote: InsertVote): Promise<Vote>;
   getVoteByNIC(nic: string): Promise<Vote | undefined>;
-  getResults(): Promise<ResultsResponse>;
+  getResults(district?: string, localGovernment?: string): Promise<ResultsResponse>;
 }
 
 export class MemStorage implements IStorage {
@@ -78,8 +78,19 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async getResults(): Promise<ResultsResponse> {
-    const votes = Array.from(this.votes.values());
+  async getResults(district?: string, localGovernment?: string): Promise<ResultsResponse> {
+    // Get all votes and filter by district/localGovernment if provided
+    let votes = Array.from(this.votes.values());
+    
+    // Apply filters if specified
+    if (district) {
+      votes = votes.filter(vote => vote.district === district);
+    }
+    
+    if (localGovernment) {
+      votes = votes.filter(vote => vote.localGovernment === localGovernment);
+    }
+    
     const totalVotes = votes.length;
     
     // Count votes for each party
@@ -114,10 +125,21 @@ export class MemStorage implements IStorage {
     // Sort by vote count (descending)
     parties.sort((a, b) => b.votes - a.votes);
 
+    // Get unique districts and local governments for filters
+    const allVotes = Array.from(this.votes.values());
+    const districts = Array.from(new Set(allVotes.map(vote => vote.district))).sort();
+    const localGovernments = Array.from(new Set(allVotes.map(vote => vote.localGovernment))).sort();
+
     return {
       parties,
       totalVotes,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+      districts,
+      localGovernments,
+      filters: {
+        district: district || null,
+        localGovernment: localGovernment || null
+      }
     };
   }
 }
