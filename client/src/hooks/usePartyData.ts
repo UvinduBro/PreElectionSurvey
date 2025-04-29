@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ResultsResponse } from "@shared/schema";
 
@@ -10,6 +10,7 @@ interface UsePartyDataOptions {
 export function usePartyData(options: UsePartyDataOptions = {}) {
   const [district, setDistrict] = useState<string | undefined>(options.initialDistrict);
   const [localGovernment, setLocalGovernment] = useState<string | undefined>(options.initialLocalGovernment);
+  const [availableLocalGovernments, setAvailableLocalGovernments] = useState<string[]>([]);
 
   // Build query string for filters
   const getQueryString = () => {
@@ -48,29 +49,35 @@ export function usePartyData(options: UsePartyDataOptions = {}) {
   // Get available filter options
   const availableDistricts = results?.districts || [];
   
-  // Filter local governments based on selected district
-  let filteredLocalGovernments: string[] = [];
-  if (!district || district === 'all') {
-    // If no district selected, show all local governments
-    filteredLocalGovernments = results?.localGovernments || [];
-  } else {
-    // If district selected, filter local governments for this district
-    filteredLocalGovernments = (results?.localGovernments || [])
-      .filter(lg => {
-        // Find votes that match this local government and district
-        const matchingVotes = (results?.votes || [])
-          .filter(vote => vote.localGovernment === lg && vote.district === district);
-        return matchingVotes.length > 0;
-      });
-  }
+  // Update local governments when district changes or results are fetched
+  useEffect(() => {
+    if (results) {
+      setAvailableLocalGovernments(results.localGovernments || []);
+    }
+  }, [results, district]);
   
-  const availableLocalGovernments = filteredLocalGovernments;
-  const currentFilters = results?.filters || { district: null, localGovernment: null };
+  // Fetch local governments for a specific district
+  const fetchLocalGovernments = async (selectedDistrict: string) => {
+    try {
+      const response = await fetch(`/api/local-governments?district=${encodeURIComponent(selectedDistrict)}`);
+      if (!response.ok) throw new Error('Failed to fetch local governments');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching local governments:', error);
+      return [];
+    }
+  };
 
-  // Clear local government when district changes
-  const handleDistrictChange = (newDistrict: string | undefined) => {
+  // Clear local government when district changes and fetch new local governments
+  const handleDistrictChange = async (newDistrict: string | undefined) => {
     setDistrict(newDistrict);
     setLocalGovernment(undefined);
+    
+    if (newDistrict && newDistrict !== 'all') {
+      const localGovs = await fetchLocalGovernments(newDistrict);
+      setAvailableLocalGovernments(localGovs);
+    }
   };
 
   return {
@@ -79,7 +86,6 @@ export function usePartyData(options: UsePartyDataOptions = {}) {
     lastUpdated,
     availableDistricts,
     availableLocalGovernments,
-    currentFilters,
     district,
     localGovernment,
     setDistrict: handleDistrictChange,

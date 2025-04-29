@@ -155,13 +155,28 @@ export class FirebaseStorage implements IStorage {
       // Sort by vote count (descending)
       parties.sort((a, b) => b.votes - a.votes);
 
-      // Get all votes for district and local government information
+      // Import district data from the static file
+      const { getDistricts } = await import('./data/districts');
+      
+      // Get all districts from our comprehensive list (not just the ones with votes)
+      const allDistricts = getDistricts();
+      
+      // Get all votes for local government information
       const allVotesSnapshot = await votesCollection.get();
       const allVotes = allVotesSnapshot.docs.map(doc => ({ id: parseInt(doc.id), ...doc.data() })) as Vote[];
       
-      // Extract unique districts and local governments
-      const districts = Array.from(new Set(allVotes.map(vote => vote.district))).sort();
-      const localGovernments = Array.from(new Set(allVotes.map(vote => vote.localGovernment))).sort();
+      // Extract unique local governments from actual votes
+      // This will change based on the selected district
+      let availableLocalGovernments: string[] = [];
+      
+      if (district && district !== 'all') {
+        // If a district is selected, get its local governments from the database
+        const { getLocalGovernments } = await import('./data/districts');
+        availableLocalGovernments = getLocalGovernments(district);
+      } else {
+        // If no district is selected, show all local governments with votes
+        availableLocalGovernments = Array.from(new Set(allVotes.map(vote => vote.localGovernment))).sort();
+      }
 
       // Prepare minimal vote info for filtering
       const voteInfo = allVotes.map(vote => ({
@@ -173,8 +188,8 @@ export class FirebaseStorage implements IStorage {
         parties,
         totalVotes,
         lastUpdated: new Date().toISOString(),
-        districts,
-        localGovernments,
+        districts: allDistricts,  // Always return the complete list of districts
+        localGovernments: availableLocalGovernments,
         votes: voteInfo,
         filters: {
           district: district || null,
