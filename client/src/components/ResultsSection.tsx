@@ -1,9 +1,24 @@
 import { PartyCard } from "@/components/PartyCard";
 import { usePartyData } from "@/hooks/usePartyData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertCircle } from "lucide-react";
 
 export function ResultsSection() {
-  const { partyResults, totalVotes, lastUpdated, isLoading, isError } = usePartyData();
+  const { 
+    partyResults, 
+    totalVotes, 
+    lastUpdated, 
+    availableDistricts,
+    availableLocalGovernments,
+    district,
+    localGovernment,
+    setDistrict,
+    setLocalGovernment,
+    isLoading, 
+    isError 
+  } = usePartyData();
 
   if (isError) {
     return (
@@ -21,7 +36,77 @@ export function ResultsSection() {
   return (
     <section className="mb-12">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-semibold text-gray-800 mb-6">Current Survey Results</h3>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4 md:mb-0">Current Survey Results</h3>
+          
+          <div className="w-full md:w-auto flex flex-col md:flex-row gap-4">
+            <div className="w-full md:w-[200px]">
+              <Select
+                value={district}
+                onValueChange={(value) => setDistrict(value || undefined)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All Districts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Districts</SelectItem>
+                  {availableDistricts.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="w-full md:w-[250px]">
+              <Select
+                value={localGovernment}
+                onValueChange={(value) => setLocalGovernment(value || undefined)}
+                disabled={!district || availableLocalGovernments.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All Local Governments" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Local Governments</SelectItem>
+                  {availableLocalGovernments.map((lg) => (
+                    <SelectItem key={lg} value={lg}>{lg}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {((district && district !== 'all') || (localGovernment && localGovernment !== 'all')) && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setDistrict(undefined);
+                  setLocalGovernment(undefined);
+                }}
+                className="h-10"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {/* Filter notification */}
+        {((district && district !== 'all') || (localGovernment && localGovernment !== 'all')) && (
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex items-start">
+            <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+            <div>
+              <p className="text-sm text-blue-800">
+                <span className="font-medium">Filtered results:</span> {' '}
+                {district && district !== 'all' && <span>District: <strong>{district}</strong></span>}
+                {district && district !== 'all' && localGovernment && localGovernment !== 'all' && <span> | </span>}
+                {localGovernment && localGovernment !== 'all' && <span>Local Government: <strong>{localGovernment}</strong></span>}
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Showing {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'} matching these criteria.
+              </p>
+            </div>
+          </div>
+        )}
         
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -43,9 +128,15 @@ export function ResultsSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {partyResults.map((party) => (
-              <PartyCard key={party.id} party={party} />
-            ))}
+            {partyResults.length > 0 ? (
+              partyResults.map((party) => (
+                <PartyCard key={party.id} party={party} />
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-500">No votes recorded for this selection.</p>
+              </div>
+            )}
           </div>
         )}
         
