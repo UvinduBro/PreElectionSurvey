@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import slElectionsLogo from "@/assets/sl-elections-logo.svg";
 
 export function Footer() {
@@ -19,25 +20,25 @@ export function Footer() {
             <div>
               <h3 className="text-sm font-semibold text-gray-700 tracking-wider uppercase mb-4">About</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Survey Methodology</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Privacy Policy</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Terms of Service</a></li>
+                <li><Link href="/survey-methodology" className="text-sm text-gray-600 hover:text-primary">Survey Methodology</Link></li>
+                <li><Link href="/privacy-policy" className="text-sm text-gray-600 hover:text-primary">Privacy Policy</Link></li>
+                <li><Link href="/terms-of-service" className="text-sm text-gray-600 hover:text-primary">Terms of Service</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-700 tracking-wider uppercase mb-4">Resources</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Election Information</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Local Government</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Election Commission</a></li>
+                <li><a href="https://elections.gov.lk" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-primary">Election Information</a></li>
+                <li><a href="https://www.gov.lk/sri-lanka/government" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-primary">Local Government</a></li>
+                <li><a href="https://elections.gov.lk" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-primary">Election Commission</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-700 tracking-wider uppercase mb-4">Contact</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Email Us</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Help Center</a></li>
-                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Feedback</a></li>
+                <li><a href="mailto:contact@electionsurvey.example.com" className="text-sm text-gray-600 hover:text-primary">Email Us</a></li>
+                <li><a href="mailto:help@electionsurvey.example.com" className="text-sm text-gray-600 hover:text-primary">Help Center</a></li>
+                <li><a href="mailto:feedback@electionsurvey.example.com" className="text-sm text-gray-600 hover:text-primary">Feedback</a></li>
               </ul>
             </div>
           </div>
