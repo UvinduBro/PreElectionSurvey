@@ -413,7 +413,16 @@ export function VotingForm({ onSubmitSuccess, onError }: VotingFormProps) {
                   )}
                 />
                 
-                <div className="flex justify-between mt-8">
+                <div className="border-t border-gray-200 mt-8 pt-4 mb-4">
+                  <p className="text-sm text-gray-600 mb-4">
+                    <strong>Data Policy Notice:</strong> By submitting this form, you agree to our{' '}
+                    <a href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</a> and{' '}
+                    <a href="/terms-of-service" className="text-primary hover:underline">Terms of Service</a>. We do not sell your personal information to third parties.
+                    The data collected will only be used for the purpose of this pre-election survey.
+                  </p>
+                </div>
+                
+                <div className="flex justify-between mt-4">
                   <Button
                     type="button"
                     variant="outline"
