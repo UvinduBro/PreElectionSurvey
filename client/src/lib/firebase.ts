@@ -2,15 +2,23 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, type User } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, orderBy, limit } from "firebase/firestore";
 
-// Firebase configuration - these should be provided as environment variables
-// in a production environment
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-key-for-development",
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo"}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo",
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo"}.appspot.com`,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "demo-app-id",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+// Validate Firebase configuration
+const requiredKeys = ['apiKey', 'projectId', 'appId'] as const;
+requiredKeys.forEach(key => {
+  if (!firebaseConfig[key]) {
+    console.warn(`Missing Firebase configuration key: ${key}`);
+  }
+});
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

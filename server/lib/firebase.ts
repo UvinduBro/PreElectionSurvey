@@ -1,15 +1,19 @@
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue, CollectionReference, DocumentData, Query } from 'firebase-admin/firestore';
 import { type PartyId, type InsertUser, type User, type InsertVote, type Vote, type PartyResult, type ResultsResponse } from '@shared/schema';
+import { firebaseAdminConfig, validateConfig } from '../config';
+
+// Check if all required environment variables are present
+validateConfig();
 
 // Initialize Firebase Admin with environment variables
 let firebaseApp;
 try {
   firebaseApp = initializeApp({
     credential: cert({
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+      projectId: firebaseAdminConfig.projectId,
+      clientEmail: firebaseAdminConfig.clientEmail || '',
+      privateKey: firebaseAdminConfig.privateKey || '',
     }),
   });
 } catch (error) {
