@@ -82,15 +82,7 @@ export function VotingForm({ onSubmitSuccess, onError }: VotingFormProps) {
       setIsLoadingDistricts(true);
       setFetchError("");
       try {
-        // In a real implementation, we would fetch from API
-        // For now, hardcode some districts
-        const districtsList = [
-          "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya", 
-          "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-          "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-          "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-          "Monaragala", "Ratnapura", "Kegalle"
-        ];
+        const districtsList = await fetchDistricts();
         setDistricts(districtsList);
       } catch (error) {
         console.error("Failed to load districts:", error);
@@ -114,32 +106,7 @@ export function VotingForm({ onSubmitSuccess, onError }: VotingFormProps) {
     setFetchError("");
     
     try {
-      // In a real implementation, we would fetch from API based on district
-      // For now, hardcode some local governments for demo
-      const localGovMap: Record<string, string[]> = {
-        "Colombo": [
-          "Colombo Municipal Council", 
-          "Dehiwala-Mount Lavinia Municipal Council", 
-          "Sri Jayawardenepura Kotte Municipal Council",
-          "Kaduwela Municipal Council",
-          "Moratuwa Municipal Council",
-          "Kolonnawa Urban Council"
-        ],
-        "Gampaha": [
-          "Gampaha Municipal Council",
-          "Negombo Municipal Council",
-          "Wattala-Mabole Urban Council",
-          "Ja-Ela Urban Council"
-        ],
-        "Kandy": [
-          "Kandy Municipal Council",
-          "Wattegama Urban Council",
-          "Kadugannawa Urban Council",
-          "Gampola Urban Council"
-        ]
-      };
-      
-      const localGovs = localGovMap[district] || [];
+      const localGovs = await fetchLocalGovernments(district);
       setLocalGovernments(localGovs);
     } catch (error) {
       console.error("Failed to load local governments:", error);
