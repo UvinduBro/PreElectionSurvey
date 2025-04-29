@@ -36,6 +36,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Check for duplicate user ID (Google account)
+      const existingUserVote = await storage.getVoteByUserId(voteData.userId);
+      if (existingUserVote) {
+        return res.status(400).json({ 
+          message: "You have already submitted a vote with this Google account."
+        });
+      }
+      
       // Store the vote
       const vote = await storage.createVote(voteData);
       

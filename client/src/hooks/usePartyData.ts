@@ -47,7 +47,24 @@ export function usePartyData(options: UsePartyDataOptions = {}) {
   
   // Get available filter options
   const availableDistricts = results?.districts || [];
-  const availableLocalGovernments = results?.localGovernments || [];
+  
+  // Filter local governments based on selected district
+  let filteredLocalGovernments: string[] = [];
+  if (!district || district === 'all') {
+    // If no district selected, show all local governments
+    filteredLocalGovernments = results?.localGovernments || [];
+  } else {
+    // If district selected, filter local governments for this district
+    filteredLocalGovernments = (results?.localGovernments || [])
+      .filter(lg => {
+        // Find votes that match this local government and district
+        const matchingVotes = (results?.votes || [])
+          .filter(vote => vote.localGovernment === lg && vote.district === district);
+        return matchingVotes.length > 0;
+      });
+  }
+  
+  const availableLocalGovernments = filteredLocalGovernments;
   const currentFilters = results?.filters || { district: null, localGovernment: null };
 
   // Clear local government when district changes

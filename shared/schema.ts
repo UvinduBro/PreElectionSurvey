@@ -65,12 +65,18 @@ export const partyResultSchema = z.object({
   percentage: z.number(),
 });
 
+export const voteInfoSchema = z.object({
+  district: z.string(),
+  localGovernment: z.string()
+});
+
 export const resultsResponseSchema = z.object({
   parties: z.array(partyResultSchema),
   totalVotes: z.number(),
   lastUpdated: z.string(),
   districts: z.array(z.string()).optional(),
   localGovernments: z.array(z.string()).optional(),
+  votes: z.array(voteInfoSchema).optional(),
   filters: z.object({
     district: z.string().nullable(),
     localGovernment: z.string().nullable()
