@@ -73,6 +73,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (_req: Request, res: Response) => {
     res.status(200).json({ status: "up" });
   });
+  
+  // Get districts endpoint
+  app.get("/api/districts", async (_req: Request, res: Response) => {
+    try {
+      const { getDistricts } = await import('./data/districts');
+      const districts = getDistricts();
+      res.json(districts);
+    } catch (error) {
+      console.error("Error getting districts:", error);
+      res.status(500).json({ error: "Failed to retrieve districts" });
+    }
+  });
+  
+  // Get local governments endpoint
+  app.get("/api/local-governments", async (req: Request, res: Response) => {
+    const { district } = req.query;
+    
+    if (!district) {
+      return res.status(400).json({ error: "District parameter is required" });
+    }
+    
+    try {
+      const { getLocalGovernments } = await import('./data/districts');
+      const localGovernments = getLocalGovernments(district as string);
+      res.json(localGovernments);
+    } catch (error) {
+      console.error("Error getting local governments:", error);
+      res.status(500).json({ error: "Failed to retrieve local governments" });
+    }
+  });
 
   const httpServer = createServer(app);
 
