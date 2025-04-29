@@ -8,20 +8,29 @@ const firebaseConfig = {
   authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  // messagingSenderId is optional for our application's needs
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
+} as const;
 
 // Validate Firebase configuration
-const requiredKeys = ['apiKey', 'projectId', 'appId'] as const;
+type ConfigKey = keyof typeof firebaseConfig;
+const requiredKeys: ConfigKey[] = ['apiKey', 'projectId', 'appId'];
 requiredKeys.forEach(key => {
   if (!firebaseConfig[key]) {
     console.warn(`Missing Firebase configuration key: ${key}`);
   }
 });
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase (prevent duplicate initialization)
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+} catch (error) {
+  // If already initialized, use the existing app
+  console.info('Firebase app already initialized, using existing instance');
+  app = initializeApp();
+}
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
